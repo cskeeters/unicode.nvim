@@ -41,3 +41,40 @@ return {
     },
 }
 ```
+
+# Dependencies
+
+This plugin depends on [starwing/luautf8](https://github.com/starwing/luautf8), which can be installed via [LuaRocks](https://luarocks.org/).
+
+> [!IMPORTANT]
+> Neovim uses Lua 5.1, so you have to pass that flag to `luarocks`.
+
+What I do is install the rock on the command line and then make sure `package.cpath` is set properly in Neovim's configuration (`init.lua`).
+
+
+```bash
+luarocks install luautf8 --lua-version=5.1 --local CFLAGS="$(CFLAGS) -std=c99 -fPIC" [--local]
+```
+
+> [!NOTE]
+> CFLAGS is **not** necessary unless your compiling on gnu < 5.0.
+
+
+## Neovim Configuration for Local Installation
+
+```lua
+local HOME = os.getenv("HOME")
+package.cpath = package.cpath .. ";" ..  HOME .. "/.luarocks/lib/lua/5.1/?.so"
+```
+
+## Global installation
+
+```lua
+package.cpath = package.cpath .. ";/usr/lib64/lua/5.1/?.so"
+```
+
+> [!TIP]
+> The path may vary by OS/Distribution.  You can check your path with 
+> ```bash
+> luarocks path --lua-version=5.1
+> ```
