@@ -119,11 +119,13 @@ function load_characters(categories)
 
         -- Generate fzf_line for fzf (Use tab delimiter instead of ; for generated lines)
         local code = data[1]
-        local fzf_line = string.format("%s	%-80s	%s (%s)", code, desc, " ", code)
-        if name ~= "<control>" then
-            fzf_line = string.format("%s	%-80s	%s (%s)", code, desc,  utf8.char(tonumber(code, 16)), code)
+        local character = utf8.char(tonumber(code, 16))
+
+        if category_abbr == "Cc" then
+            character = " "
         end
 
+        local fzf_line = string.format("%s	%-80s	%s (%s)", code, desc, character, code)
         table.insert(options, fzf_line)
     end
 
