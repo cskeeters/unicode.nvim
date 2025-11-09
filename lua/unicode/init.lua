@@ -165,6 +165,11 @@ M.select_unicode = function()
                     -- log_trace("Set register "..char);
 
                     vim.cmd.normal('i' .. utf8.char(code))
+
+                    -- Move curor over by the byte size of the selected character
+                    local row, col = unpack(vim.api.nvim_win_get_cursor(0))
+                    local offset = string.len(utf8.char(code))
+                    vim.api.nvim_win_set_cursor(0, {row, col + offset})
                 else
                     log_error(string.format("Code %s is not a number.", char));
                 end
