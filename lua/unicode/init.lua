@@ -149,18 +149,25 @@ M.select_unicode = function()
         return
     end
 
+    -- detect if telescope is loaded
+    local telescope = pcall(require, "telescope") and package.loaded["telescope._extensions.ui-select"]
+
     local start_mode = vim.api.nvim_get_mode().mode
     log_trace("Starting in mode: "..start_mode)
 
-    if vim.api.nvim_get_mode().mode == 'i' then
-        key = vim.api.nvim_replace_termcodes("<Esc>", true, false, true)
-        -- n: no remap
-        -- x: Execute commands until typeahead is empty (critical)
-        vim.api.nvim_feedkeys(key, 'nx', false)
+    if not telescope then
+        if vim.api.nvim_get_mode().mode == 'i' then
+            key = vim.api.nvim_replace_termcodes("<Esc>", true, false, true)
+            -- n: no remap
+            -- x: Execute commands until typeahead is empty (critical)
+            vim.api.nvim_feedkeys(key, 'nx', false)
+        end
     end
 
     local mode = vim.api.nvim_get_mode().mode
     log_trace("Starting select in mode: "..mode)
+
+    local _, start_col = unpack(vim.api.nvim_win_get_cursor(0))
 
     vim.ui.select(characters, {
         prompt = "Select a character to enter:",
@@ -193,7 +200,15 @@ M.select_unicode = function()
 
                     if callback_mode == 't' then
                         -- Handle fzf-lua
-                        vim.api.nvim_feedkeys("i", "n", true)
+
+                        local row, col = unpack(vim.api.nvim_win_get_cursor(0))
+
+                        if col ~= start_col then
+                            -- We were at the end of a line and the cursor was backed up
+                            vim.api.nvim_feedkeys("a", "n", true)
+                        else
+                            vim.api.nvim_feedkeys("i", "n", true)
+                        end
                     end
 
                     vim.api.nvim_feedkeys(utf8.char(code), "n", true)
