@@ -156,16 +156,17 @@ M.select_unicode = function()
             local s, e, char = string.find(choice, "([^%s]+)	")
 
             if s == nil then
-                vim.notify("Error parsing choice", vim.log.levels.ERROR)
+                log_error("Error parsing choice")
             else
-                vim.notify(string.format("Found %s at (%d, %d) in %s", char, s, e, choice), vim.log.levels.TRACE)
+                log_trace(string.format("Found %s at (%d, %d) in %s", char, s, e, choice))
                 local code = tonumber(char, 16)
                 if code then
                     -- vim.fn.setreg('*', utf8.char(code))
+                    -- log_trace("Set register "..char);
+
                     vim.cmd.normal('i' .. utf8.char(code))
-                    vim.notify("Set register "..char);
                 else
-                    vim.notify(string.format("Code %s is not a number.", char), vim.log.levels.ERROR);
+                    log_error(string.format("Code %s is not a number.", char));
                 end
             end
         end
