@@ -15,12 +15,12 @@ This is helpful for entering:
 * Math Symbols (𝛀 𝚫 ≠ ∑ ∫)
 * Emoji (with [Fitzpatrick modifier sequences](https://emojipedia.org/emoji-modifier-sequence)) (👍👍🏻)
 
-# Usage
+# How it works
 
-In NORMAL mode, trigger `select_unicode`, and an FZF menu will appear that allows you to filter characters by name and choose a character to be inserted.
+The plugin creates a list of characters from `data/UnicodeData.txt` that is provided to `vim.ui.select`.  The plugin assumes that the user has replaced this with [telescope](https://github.com/nvim-telescope/telescope.nvim)'s [ui-select extension](https://github.com/nvim-telescope/telescope-ui-select.nvim) or [fzf-lua](https://github.com/ibhagwan/fzf-lua).
 
-NOTE: It does not currently work in INSERT mode.
-
+> [!WARNING]
+> Neovim's default UI requires the user to scroll through too many pages of characters before making a selection which is painful.
 
 # Configuration
 
@@ -37,8 +37,7 @@ return {
     lazy = false, -- Not lazy so that categories and characters can be loaded asynchronously
 
     keys = {
-      { mode = "n", "<leader><leader>u", select_unicode, desc = "Select Unicode (normal)" },
-      { mode = "i", "<C-S-u>",           select_unicode, desc = "Select Unicode (insert)" },
+      { mode = {"n", "i"}, "<C-S-u>", select_unicode, desc = "Select Unicode" },
     },
 
     opts = {

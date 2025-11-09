@@ -147,6 +147,15 @@ M.select_unicode = function()
         return
     end
 
+    local start_mode = vim.api.nvim_get_mode().mode
+    log_trace("Starting in mode: "..start_mode)
+
+    -- if vim.api.nvim_get_mode().mode == 'i' then
+        -- vim.cmd.stopinsert()
+    -- end
+
+    -- vim.fn.feedkeys("<C-o>", "n")
+    -- vim.api.nvim_feedkeys("a", "n", true)
 
     vim.ui.select(characters, {
         prompt = "Select a character to enter:",
@@ -161,15 +170,35 @@ M.select_unicode = function()
                 log_trace(string.format("Found %s at (%d, %d) in %s", char, s, e, choice))
                 local code = tonumber(char, 16)
                 if code then
-                    -- vim.fn.setreg('*', utf8.char(code))
-                    -- log_trace("Set register "..char);
+                    -- fzf-lua puts us in normal mode as of be1c28b4a32beec16e29ac9c3edb7c6f760747ae
+                    local choice_mode = vim.api.nvim_get_mode().mode
+                    log_trace("Handling selection in mode: "..choice_mode)
 
-                    vim.cmd.normal('i' .. utf8.char(code))
+                    if choice_mode == 'n' then
+                        if start_mode == 'n' then
+                            vim.api.nvim_feedkeys("i", "n", true)
+                        else
+                            if start_mode == 'i' then
+                                vim.api.nvim_feedkeys("a", "n", true)
+                            end
+                        end
+                    end
+
+                    vim.api.nvim_feedkeys(utf8.char(code), "n", true)
+
+                    -- we're in insert mode now regardless
+                    if start_mode == 'n' then
+                        key = vim.api.nvim_replace_termcodes("<Esc>", true, false, true)
+                        vim.api.nvim_feedkeys(key, 'n', false)
+
+                        -- move to the left one char (may not work if we're at the end of a line, but no error)
+                        vim.api.nvim_feedkeys("l", "n", true)
+                    end
 
                     -- Move curor over by the byte size of the selected character
-                    local row, col = unpack(vim.api.nvim_win_get_cursor(0))
-                    local offset = string.len(utf8.char(code))
-                    vim.api.nvim_win_set_cursor(0, {row, col + offset})
+                    -- local row, col = unpack(vim.api.nvim_win_get_cursor(0))
+                    -- local offset = string.len(utf8.char(code))
+                    -- vim.api.nvim_win_set_cursor(0, {row, col + offset})
                 else
                     log_error(string.format("Code %s is not a number.", char));
                 end
