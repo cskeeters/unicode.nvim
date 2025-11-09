@@ -46,6 +46,54 @@ return {
 }
 ```
 
+
+## fzf-lua
+
+```lua
+return {
+  "ibhagwan/fzf-lua",
+  config = function()
+    require("fzf-lua").setup({
+        winopts = {
+            fullscreen = true,
+        },
+    })
+
+    -- Replace vim.ui.select menu
+    require("fzf-lua").register_ui_select()
+
+  end
+}
+```
+
+## telescope
+
+```lua
+return {
+    'nvim-telescope/telescope.nvim',
+    dependencies = {
+        'nvim-lua/plenary.nvim',
+        'nvim-telescope/telescope-ui-select.nvim',
+    },
+
+    init = function()
+        require("telescope").setup({
+            defaults = {
+                layout_strategy = 'horizontal',
+                layout_config = {
+                    height = 0.99,
+                    width = 0.99,
+                },
+                sorting_strategy = "ascending",
+            },
+        })
+
+        -- Replace vim.ui.select menu
+        require('telescope').load_extension('ui-select')
+    end
+}
+```
+
 # Dependencies
 
 This plugin depends on [starwing/luautf8](https://github.com/starwing/luautf8), which can be installed via [LuaRocks](https://luarocks.org/).
@@ -68,13 +116,14 @@ luarocks install luautf8 --lua-version=5.1 --local CFLAGS="$(CFLAGS) -std=c99 -f
 
 ```lua
 local HOME = os.getenv("HOME")
-package.cpath = package.cpath .. ";" ..  HOME .. "/.luarocks/lib/lua/5.1/?.so"
+package.cpath = package.cpath .. ";" ..  HOME .. "/.luarocks/lib/lua/5.1/?.so"   -- macOS
+package.cpath = package.cpath .. ";" ..  HOME .. "/.luarocks/lib64/lua/5.1/?.so" -- Linux
 ```
 
-## Global installation
+## Neovim Configuration for Global installation
 
 ```lua
-package.cpath = package.cpath .. ";/usr/lib64/lua/5.1/?.so"
+package.cpath = package.cpath .. ";/usr/lib64/lua/5.1/?.so" -- Linux
 ```
 
 > [!TIP]

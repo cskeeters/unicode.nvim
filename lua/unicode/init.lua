@@ -150,12 +150,15 @@ M.select_unicode = function()
     local start_mode = vim.api.nvim_get_mode().mode
     log_trace("Starting in mode: "..start_mode)
 
-    -- if vim.api.nvim_get_mode().mode == 'i' then
-        -- vim.cmd.stopinsert()
-    -- end
+    if vim.api.nvim_get_mode().mode == 'i' then
+        key = vim.api.nvim_replace_termcodes("<Esc>", true, false, true)
+        -- n: no remap
+        -- x: Execute commands until typeahead is empty (critical)
+        vim.api.nvim_feedkeys(key, 'nx', false)
+    end
 
-    -- vim.fn.feedkeys("<C-o>", "n")
-    -- vim.api.nvim_feedkeys("a", "n", true)
+    local mode = vim.api.nvim_get_mode().mode
+    log_trace("Starting select in mode: "..mode)
 
     vim.ui.select(characters, {
         prompt = "Select a character to enter:",
@@ -170,11 +173,13 @@ M.select_unicode = function()
                 log_trace(string.format("Found %s at (%d, %d) in %s", char, s, e, choice))
                 local code = tonumber(char, 16)
                 if code then
-                    -- fzf-lua puts us in normal mode as of be1c28b4a32beec16e29ac9c3edb7c6f760747ae
-                    local choice_mode = vim.api.nvim_get_mode().mode
-                    log_trace("Handling selection in mode: "..choice_mode)
+                    -- telescope will always be in normal mode (n)
+                    -- fzf-lua   will always be in terminal mode (t)
+                    local callback_mode = vim.api.nvim_get_mode().mode
+                    log_trace("Handling selection in mode: "..callback_mode)
 
-                    if choice_mode == 'n' then
+                    if callback_mode == 'n' then
+                        -- Handle telescope
                         if start_mode == 'n' then
                             vim.api.nvim_feedkeys("i", "n", true)
                         else
@@ -184,9 +189,13 @@ M.select_unicode = function()
                         end
                     end
 
+                    if callback_mode == 't' then
+                        -- Handle fzf-lua
+                        vim.api.nvim_feedkeys("i", "n", true)
+                    end
+
                     vim.api.nvim_feedkeys(utf8.char(code), "n", true)
 
-                    -- we're in insert mode now regardless
                     if start_mode == 'n' then
                         key = vim.api.nvim_replace_termcodes("<Esc>", true, false, true)
                         vim.api.nvim_feedkeys(key, 'n', false)
