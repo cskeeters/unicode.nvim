@@ -27,7 +27,7 @@ The plugin creates a list of characters from `data/UnicodeData.txt` that is prov
 ```lua
 -- function is required so that require('unicode') will only execute when key
 -- is pressed after lua is initialized.
-local function select_unicode()
+local function SelectUnicode()
     require('unicode').select_unicode()
 end
 
@@ -37,7 +37,7 @@ return {
     lazy = false, -- Not lazy so that categories and characters can be loaded asynchronously
 
     keys = {
-      { mode = {"n", "i"}, "<C-S-u>", select_unicode, desc = "Select Unicode" },
+      { mode = {"n", "i"}, "<C-S-u>", SelectUnicode, desc = "Select Unicode" },
     },
 
     opts = {
